@@ -1,6 +1,6 @@
-// scrape.js (Docker ভার্সন)
+// scrape.js (Docker ভার্সন - ভেরিয়েবল ফিক্সড)
 
-const puppeteer = require('puppeteer-core'); // 1. puppeteer-core ব্যবহার করুন
+const puppeteer = require('puppeteer-core');
 const express = require('express');
 const app = express();
 
@@ -11,7 +11,6 @@ async function scrapeData() {
     try {
         browser = await puppeteer.launch({
             headless: true,
-            // 2. Docker-এ Chrome-এর সঠিক পাথ (path)
             executablePath: '/usr/bin/google-chrome-stable', 
             args: [
                 '--no-sandbox', 
@@ -20,30 +19,28 @@ async function scrapeData() {
             ]
         });
 
-        // ...বাকি কোড সব অপরিবর্তিত থাকবে...
-
         const page = await browser.newPage();
         await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36');
         
-       
-
         await page.goto('https://www.espn.in/football/scoreboard', {
             waitUntil: 'domcontentloaded',
-            timeout: 60000
+            timeout: 60000 // ৬০ সেকেন্ড টাইমআউট
         });
 
         const data = await page.evaluate(() => {
-            // ...স্ক্র্যাপিং কোড...
             const matchCards = document.querySelectorAll('section.Scoreboard.bg-clr-white');
             const results = [];
             matchCards.forEach(card => {
+                // ভেরিয়েবলের নামগুলো ছোট করা হলো
                 const time = card.querySelector('div.ScoreCell__Time')?.innerText ?? 'N/A';
-                const teamName1 = card.querySelector('.ScoreboardScoreCell__Item--home .ScoreCell__TeamName')?.innerText ?? 'N/A';
+                const team1 = card.querySelector('.ScoreboardScoreCell__Item--home .ScoreCell__TeamName')?.innerText ?? 'N/A';
                 const score1 = card.querySelector('.ScoreboardScoreCell__Item--home .ScoreCell__Score')?.innerText ?? '-';
-                const teamName2 = card.querySelector('.ScoreboardScoreCell__Item--away .ScoreCell__TeamName')?.innerText ?? 'N/A';
+                const team2 = card.querySelector('.ScoreboardScoreCell__Item--away .ScoreCell__TeamName')?.innerText ?? 'N/A';
                 const score2 = card.querySelector('.ScoreboardScoreCell__Item--away .ScoreCell__Score')?.innerText ?? '-';
                 const venue = card.querySelector('.LocationDetail__Item--headline')?.innerText ?? 'N/A';
                 const location = card.querySelector('.LocationDetail__Item:not(.LocationDetail__Item--headline)')?.innerText ?? '';
+                
+                // এখন এটি সঠিকভাবে কাজ করবে
                 results.push({ time, team1, score1, team2, score2, venue: `${venue}, ${location}` });
             });
             return results;
@@ -59,7 +56,7 @@ async function scrapeData() {
     }
 }
 
-// ...বাকি express সার্ভারের কোড অপরিবর্তিত থাকবে...
+// express সার্ভারের কোড
 app.get('/data', async (req, res) => {
     console.log("Fetching data...");
     const scrapedData = await scrapeData();
@@ -74,4 +71,3 @@ app.get('/', (req, res) => {
 app.listen(PORT, () => {
     console.log(`Scraper server listening on port ${PORT}`);
 });
-
