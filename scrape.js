@@ -25,8 +25,11 @@ async function scrapeData() {
         const page = await browser.newPage();
         await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36');
         
+       
+
         await page.goto('https://www.espn.in/football/scoreboard', {
-            waitUntil: 'networkidle2'
+            waitUntil: 'domcontentloaded',
+            timeout: 60000
         });
 
         const data = await page.evaluate(() => {
@@ -71,3 +74,4 @@ app.get('/', (req, res) => {
 app.listen(PORT, () => {
     console.log(`Scraper server listening on port ${PORT}`);
 });
+
