@@ -1,0 +1,17 @@
+{
+  "name": "my_scraper_render",
+  "version": "1.0.0",
+  "description": "Scraper on Render",
+  "main": "scrape.js",
+  "scripts": {
+    "start": "node scrape.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "puppeteer": "^22.13.1",
+    "express": "^4.19.2"
+  }
+}
